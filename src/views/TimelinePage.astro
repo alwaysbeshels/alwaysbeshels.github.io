@@ -1,0 +1,74 @@
+---
+import Base from "../layouts/Base.astro";
+import { timeline, timelineCopy } from "../data/timeline";
+import { formatMonth } from "../lib/dates";
+import { otherLang, routes, type Lang } from "../i18n/paths";
+import { useUI } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useUI(lang);
+
+const description =
+  lang === "en"
+    ? "Experience timeline for Shelsea Saint-Fleur. Known facts only — unfinished entries are marked TODO."
+    : "Parcours de Shelsea Saint-Fleur. Seulement les faits connus — les entrées incomplètes sont marquées TODO.";
+
+function datesFor(entry: (typeof timeline)[number]): string {
+  if (!entry.start) return t.todoDates;
+  const start = formatMonth(entry.start, lang);
+  if (entry.current) return `${start} — ${t.present}`;
+  if (!entry.end) return start;
+  return `${start} — ${formatMonth(entry.end, lang)}`;
+}
+---
+
+<Base
+  lang={lang}
+  title={lang === "en" ? "Experience" : "Parcours"}
+  description={description}
+  path={routes.timeline[lang]}
+  alternatePath={routes.timeline[otherLang(lang)]}
+  section={t.sectionTimeline}
+>
+  <main id="content" class="page wrap" data-pagefind-body>
+    <header class="page-head">
+      <p class="eyebrow">{t.timeline}</p>
+      <h1>{lang === "en" ? "Experience" : "Parcours"}</h1>
+      <p class="lede">{t.timelineIntro}</p>
+    </header>
+
+    <aside class="known" aria-label={t.known}>
+      <p class="kicker">{t.known}</p>
+      <ul>
+        <li>{t.role}</li>
+        <li>{t.place}</li>
+        <li>{t.degree}</li>
+      </ul>
+    </aside>
+
+    <ol class="timeline">
+      {
+        timeline.map((entry) => {
+          const copy = timelineCopy(entry, lang);
+          return (
+            <li id={entry.id}>
+              <p class="when">{datesFor(entry)}</p>
+              <article class:list={["event", entry.placeholder && "is-placeholder"]}>
+                {entry.placeholder && <p class="badge">{t.toComplete}</p>}
+                <p class="kicker">{entry.kind === "work" ? t.kindWork : t.kindEducation}</p>
+                <h2>{copy.title}</h2>
+                <p class="org">{copy.org}</p>
+                <p class="where">{copy.location}</p>
+                <p>{copy.summary}</p>
+              </article>
+            </li>
+          );
+        })
+      }
+    </ol>
+  </main>
+</Base>

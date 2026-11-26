@@ -1,0 +1,64 @@
+---
+import Base from "../layouts/Base.astro";
+import ProjectArticle from "../components/ProjectArticle.astro";
+import { loadProjects, projectsByKind, toProjectView } from "../lib/content";
+import { otherLang, routes, type Lang } from "../i18n/paths";
+import { useUI } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useUI(lang);
+const projects = await loadProjects();
+const live = projectsByKind(projects, "product").map((entry) => toProjectView(entry, lang));
+const open = projectsByKind(projects, "opensource").map((entry) => toProjectView(entry, lang));
+const description =
+  lang === "en"
+    ? "Live products and open source from Shelsea Saint-Fleur. The map is online. The code is public."
+    : "Produits en ligne et code ouvert de Shelsea Saint-Fleur. La carte est en ligne. Le code est public.";
+---
+
+<Base
+  lang={lang}
+  title={t.projects}
+  description={description}
+  path={routes.projects[lang]}
+  alternatePath={routes.projects[otherLang(lang)]}
+  section={t.sectionProjects}
+>
+  <main id="content" class="page wrap" data-pagefind-body>
+    <header class="page-head">
+      <p class="eyebrow">{t.projects}</p>
+      <h1>{t.projects}</h1>
+      <p class="lede">{t.projectsIntro}</p>
+    </header>
+
+    <section aria-labelledby="live-heading">
+      <header class="section-head">
+        <p class="index">01</p>
+        <div>
+          <h2 id="live-heading">{t.live}</h2>
+          <p>{t.liveIntro}</p>
+        </div>
+      </header>
+      <div class="stack">
+        {live.map((project) => <ProjectArticle project={project} t={t} />)}
+      </div>
+    </section>
+
+    <section aria-labelledby="oss-heading">
+      <header class="section-head">
+        <p class="index">02</p>
+        <div>
+          <h2 id="oss-heading">{t.openSource}</h2>
+          <p>{t.ossIntro}</p>
+        </div>
+      </header>
+      <div class="stack">
+        {open.map((project) => <ProjectArticle project={project} t={t} />)}
+      </div>
+    </section>
+  </main>
+</Base>

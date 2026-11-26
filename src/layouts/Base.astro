@@ -1,0 +1,127 @@
+---
+import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { site } from "../data/site";
+import { absolute, htmlLang, ogLocale, otherLang, routes, type Lang } from "../i18n/paths";
+import { useUI } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  path: string;
+  alternatePath: string;
+  section: string;
+  /** When false, the page is a one-off (the 404) and does not claim a translation. */
+  paired?: boolean;
+  noindex?: boolean;
+  pagefindIgnore?: boolean;
+  ogType?: "website" | "article";
+  published?: Date;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const {
+  lang,
+  title,
+  description,
+  path,
+  alternatePath,
+  section,
+  paired = true,
+  noindex = false,
+  pagefindIgnore = false,
+  ogType = "website",
+  published,
+  jsonLd,
+} = Astro.props;
+
+const t = useUI(lang);
+const canonical = absolute(path);
+const enPath = lang === "en" ? path : alternatePath;
+const frPath = lang === "fr" ? path : alternatePath;
+const documentTitle = path === routes.home[lang] ? `${site.name} — ${site.author}` : `${title} · ${site.name}`;
+const image = absolute(site.ogImage);
+---
+
+<!doctype html>
+<html lang={htmlLang[lang]} data-pagefind-meta={pagefindIgnore ? undefined : `section:${section}`}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{documentTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={site.author} />
+    <meta name="theme-color" content={site.themeColor} />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="application-name" content={site.name} />
+    <meta name="apple-mobile-web-app-title" content={site.name} />
+    <meta name="generator" content={Astro.generator} />
+    {noindex && <meta name="robots" content="noindex" />}
+
+    <script is:inline define:vars={{ storageKey: site.themeStorageKey }}>
+      (function () {
+        try {
+          var stored = localStorage.getItem(storageKey);
+          if (stored === "light" || stored === "dark") {
+            document.documentElement.setAttribute("data-theme", stored);
+          }
+        } catch (error) {
+          /* storage blocked: follow the system theme */
+        }
+      })();
+    </script>
+
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48" />
+    <link rel="icon" type="image/png" href="/android-chrome-192x192.png" sizes="192x192" />
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="msapplication-TileColor" content={site.themeColor} />
+    <meta name="msapplication-TileImage" content="/android-chrome-maskable-512x512.png" />
+
+    <link rel="canonical" href={canonical} />
+    {
+      paired && (
+        <>
+          <link rel="alternate" hreflang="en-CA" href={absolute(enPath)} />
+          <link rel="alternate" hreflang="fr-CA" href={absolute(frPath)} />
+          <link rel="alternate" hreflang="x-default" href={absolute(enPath)} />
+        </>
+      )
+    }
+    <link rel="alternate" type="application/rss+xml" title={useUI("en").rssTitle} href={absolute(routes.rss.en)} hreflang="en-CA" />
+    <link rel="alternate" type="application/rss+xml" title={useUI("fr").rssTitle} href={absolute(routes.rss.fr)} hreflang="fr-CA" />
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content={ogLocale[lang]} />
+    <meta property="og:locale:alternate" content={ogLocale[otherLang(lang)]} />
+    <meta property="og:title" content={documentTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={image} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content={String(site.ogWidth)} />
+    <meta property="og:image:height" content={String(site.ogHeight)} />
+    <meta property="og:image:alt" content={t.ogAlt} />
+    {published && <meta property="article:published_time" content={published.toISOString()} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={documentTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={image} />
+    <meta name="twitter:image:alt" content={t.ogAlt} />
+
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+  </head>
+  <body data-pagefind-ignore={pagefindIgnore ? "all" : undefined}>
+    <a class="skip" href="#content">{t.skip}</a>
+    <Header lang={lang} path={path} alternatePath={alternatePath} />
+    <slot />
+    <Footer lang={lang} />
+  </body>
+</html>

@@ -1,0 +1,52 @@
+---
+import Base from "../layouts/Base.astro";
+import SocialList from "../components/SocialList.astro";
+import { otherLang, routes, type Lang } from "../i18n/paths";
+import { useUI } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useUI(lang);
+const description =
+  lang === "en"
+    ? "About Shelsea Saint-Fleur, a data engineer in Greater Montréal."
+    : "À propos de Shelsea Saint-Fleur, ingénieure de données dans le Grand Montréal.";
+---
+
+<Base
+  lang={lang}
+  title={t.about}
+  description={description}
+  path={routes.about[lang]}
+  alternatePath={routes.about[otherLang(lang)]}
+  section={t.sectionAbout}
+>
+  <main id="content" class="page wrap about" data-pagefind-body>
+    <div class="about-grid">
+      <div>
+        <header class="page-head">
+          <p class="eyebrow">{t.about}</p>
+          <h1>Shelsea Saint-Fleur</h1>
+          <p class="lede">{t.aboutLede}</p>
+        </header>
+        <div class="prose">
+          <p>{t.aboutBody}</p>
+          <p>{t.aboutContact}</p>
+        </div>
+        <p class="more"><a href={routes.timeline[lang]}>{t.timeline}</a></p>
+      </div>
+      <div class="about-side">
+        <img
+          src="/assets/brand/logo-full.svg"
+          width="781"
+          height="721"
+          alt={t.logoAlt}
+        />
+        <SocialList variant="rows" label={t.social} />
+      </div>
+    </div>
+  </main>
+</Base>

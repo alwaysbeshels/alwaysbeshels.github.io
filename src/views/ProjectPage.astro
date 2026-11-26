@@ -1,0 +1,33 @@
+---
+import Base from "../layouts/Base.astro";
+import ProjectArticle from "../components/ProjectArticle.astro";
+import { loadProjects, toProjectView } from "../lib/content";
+import { otherLang, projectPath, routes, type Lang } from "../i18n/paths";
+import { useUI } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+  slug: string;
+}
+
+const { lang, slug } = Astro.props;
+const t = useUI(lang);
+const projects = await loadProjects();
+const entry = projects.find((project) => project.id === slug);
+if (!entry) throw new Error(`Unknown project: ${slug}`);
+const project = toProjectView(entry, lang);
+---
+
+<Base
+  lang={lang}
+  title={project.title}
+  description={project.summary}
+  path={project.href}
+  alternatePath={projectPath(otherLang(lang), slug)}
+  section={t.sectionProject}
+>
+  <main id="content" class="page wrap" data-pagefind-body>
+    <p class="back"><a href={routes.projects[lang]}>{t.allProjects}</a></p>
+    <ProjectArticle project={project} t={t} mode="study" />
+  </main>
+</Base>

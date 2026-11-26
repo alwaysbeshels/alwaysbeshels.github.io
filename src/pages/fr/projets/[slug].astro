@@ -1,0 +1,13 @@
+---
+import ProjectPage from "../../../views/ProjectPage.astro";
+import { loadProjects } from "../../../lib/content";
+
+export async function getStaticPaths() {
+  const projects = await loadProjects();
+  return projects.map((project) => ({ params: { slug: project.id } }));
+}
+
+const { slug } = Astro.params;
+if (!slug) throw new Error("Missing project slug");
+---
+<ProjectPage lang="fr" slug={slug} />

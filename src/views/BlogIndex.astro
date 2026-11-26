@@ -1,0 +1,52 @@
+---
+import Base from "../layouts/Base.astro";
+import { loadPosts, postHref } from "../lib/content";
+import { formatDate, isoDate } from "../lib/dates";
+import { otherLang, routes, type Lang } from "../i18n/paths";
+import { useUI } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useUI(lang);
+const posts = await loadPosts(lang);
+const description =
+  lang === "en"
+    ? "Notes from Shelsea's Lab."
+    : "Notes du Shelsea's Lab.";
+---
+
+<Base
+  lang={lang}
+  title={t.blog}
+  description={description}
+  path={routes.blog[lang]}
+  alternatePath={routes.blog[otherLang(lang)]}
+  section={t.sectionBlog}
+>
+  <main id="content" class="page wrap" data-pagefind-body>
+    <header class="page-head">
+      <p class="eyebrow">{t.blog}</p>
+      <h1>{t.blog}</h1>
+      <p class="lede">{t.blogIntro}</p>
+      <p class="more"><a href={routes.rss[lang]}>{t.rss}</a></p>
+    </header>
+    <ul class="note-list">
+      {
+        posts.map((post) => (
+          <li>
+            <article class="note-row">
+              <time datetime={isoDate(post.data.date)}>{formatDate(post.data.date, lang)}</time>
+              <div>
+                <h2><a href={postHref(post)}>{post.data.title}</a></h2>
+                <p>{post.data.description}</p>
+              </div>
+            </article>
+          </li>
+        ))
+      }
+    </ul>
+  </main>
+</Base>

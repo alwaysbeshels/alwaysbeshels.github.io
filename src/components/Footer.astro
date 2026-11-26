@@ -1,0 +1,64 @@
+---
+import SocialList from "./SocialList.astro";
+import { site } from "../data/site";
+import { routes, type Lang } from "../i18n/paths";
+import { useUI } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useUI(lang);
+
+const pages = [
+  { href: routes.projects[lang], label: t.projects },
+  { href: routes.blog[lang], label: t.blog },
+  { href: routes.timeline[lang], label: t.timeline },
+  { href: routes.about[lang], label: t.about },
+  { href: routes.search[lang], label: t.search },
+];
+
+const legal = [
+  { href: routes.privacy[lang], label: t.privacy },
+  { href: routes.terms[lang], label: t.terms },
+  { href: routes.rss[lang], label: t.rss },
+];
+---
+
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <img src="/assets/brand/icon.svg" width="48" height="48" alt="" />
+      <p class="footer-name" translate="no">{site.name}</p>
+      <p class="muted">{t.role}<span aria-hidden="true"> · </span>{t.place}</p>
+    </div>
+    <nav aria-label={t.footerNav}>
+      <ul>
+        {pages.map((link) => (
+          <li><a href={link.href}>{link.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+    <nav aria-label={t.legalNav}>
+      <ul>
+        {legal.map((link) => (
+          <li><a href={link.href}>{link.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+    <SocialList variant="rows" label={t.social} />
+  </div>
+  <div class="wrap footer-base">
+    <p>
+      <a href={routes.privacy[lang]}>{t.noTrackers}</a>
+    </p>
+    <p>
+      {t.rights}
+      <span aria-hidden="true"> · </span>
+      <a href={site.repo}>{t.source}</a>
+      <span aria-hidden="true"> · </span>
+      MIT
+    </p>
+  </div>
+</footer>

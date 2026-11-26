@@ -1,0 +1,45 @@
+---
+import Base from "../layouts/Base.astro";
+import { legal } from "../i18n/legal";
+import { otherLang, routes, type Lang } from "../i18n/paths";
+import { useUI } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+  page: "privacy" | "terms";
+}
+
+const { lang, page } = Astro.props;
+const t = useUI(lang);
+const copy = legal[lang][page];
+const path = routes[page][lang];
+const alternatePath = routes[page][otherLang(lang)];
+const section = page === "privacy" ? t.sectionPrivacy : t.sectionTerms;
+---
+
+<Base
+  lang={lang}
+  title={copy.title}
+  description={copy.description}
+  path={path}
+  alternatePath={alternatePath}
+  section={section}
+>
+  <main id="content" class="page wrap prose-page" data-pagefind-body>
+    <header class="page-head">
+      <p class="eyebrow">{t.legalNav}</p>
+      <h1>{copy.title}</h1>
+      <p class="meta">{t.updated}</p>
+    </header>
+    <div class="prose">
+      {
+        copy.sections.map((section) => (
+          <section>
+            <h2>{section.heading}</h2>
+            {section.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+          </section>
+        ))
+      }
+    </div>
+  </main>
+</Base>

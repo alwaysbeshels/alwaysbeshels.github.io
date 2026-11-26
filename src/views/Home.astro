@@ -1,0 +1,154 @@
+---
+import Base from "../layouts/Base.astro";
+import ProjectArticle from "../components/ProjectArticle.astro";
+import { site } from "../data/site";
+import { featuredProjects, loadPosts, loadProjects, postHref, toProjectView } from "../lib/content";
+import { formatDate, isoDate } from "../lib/dates";
+import { routes, type Lang } from "../i18n/paths";
+import { otherLang } from "../i18n/paths";
+import { useUI } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useUI(lang);
+const projects = await loadProjects();
+const live = featuredProjects(projects, "product").map((entry) => toProjectView(entry, lang));
+const open = featuredProjects(projects, "opensource").map((entry) => toProjectView(entry, lang));
+const posts = await loadPosts(lang);
+const latest = posts[0];
+
+const description =
+  lang === "en"
+    ? "Shelsea Saint-Fleur, data engineer in Greater Montréal. Live products, open source, and notes."
+    : "Shelsea Saint-Fleur, ingénieure de données dans le Grand Montréal. Produits en ligne, code ouvert et notes.";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      name: site.name,
+      url: site.url,
+      inLanguage: ["en-CA", "fr-CA"],
+      author: { "@type": "Person", name: site.author },
+      potentialAction: {
+        "@type": "SearchAction",
+        target: `${site.url}${routes.search[lang]}?q={search_term_string}`,
+        "query-input": "required name=search_term_string",
+      },
+    },
+    {
+      "@type": "Person",
+      name: site.author,
+      url: `${site.url}${routes.about[lang]}`,
+      jobTitle: t.role,
+      homeLocation: {
+        "@type": "Place",
+        name: t.place,
+        address: { "@type": "PostalAddress", addressRegion: "Québec", addressCountry: "CA" },
+      },
+      hasCredential: {
+        "@type": "EducationalOccupationalCredential",
+        credentialCategory: "degree",
+        name: t.degree,
+      },
+      sameAs: site.socials.map((item) => item.href),
+    },
+  ],
+};
+---
+
+<Base
+  lang={lang}
+  title={site.name}
+  description={description}
+  path={routes.home[lang]}
+  alternatePath={routes.home[otherLang(lang)]}
+  section={t.sectionHome}
+  jsonLd={jsonLd}
+>
+  <main id="content" data-pagefind-body>
+    <section class="hero wrap">
+      <div class="hero-copy">
+        <p class="eyebrow" translate="no">{site.name}</p>
+        <h1>{site.author}</h1>
+        <p class="lede">{t.heroLede}</p>
+        <p class="credentials">{t.degreeShort}</p>
+        <div class="hero-actions">
+          <a class="button" href={routes.projects[lang]}>{t.seeWork}</a>
+          <a class="button button-ghost" href={routes.about[lang]}>{t.about}</a>
+        </div>
+      </div>
+      <img
+        class="hero-logo"
+        src="/assets/brand/logo-full.svg"
+        width="781"
+        height="721"
+        alt={t.logoAlt}
+      />
+    </section>
+
+    <section class="band" aria-labelledby="live-heading">
+      <div class="wrap">
+        <header class="section-head">
+          <p class="index">01</p>
+          <div>
+            <h2 id="live-heading">{t.live}</h2>
+            <p>{t.liveIntro}</p>
+          </div>
+        </header>
+        <div class="stack">
+          {live.map((project) => <ProjectArticle project={project} t={t} />)}
+        </div>
+      </div>
+    </section>
+
+    <section class="band" aria-labelledby="oss-heading">
+      <div class="wrap">
+        <header class="section-head">
+          <p class="index">02</p>
+          <div>
+            <h2 id="oss-heading">{t.openSource}</h2>
+            <p>{t.ossIntro}</p>
+          </div>
+        </header>
+        <div class="stack">
+          {open.map((project) => <ProjectArticle project={project} t={t} />)}
+        </div>
+      </div>
+    </section>
+
+    <section class="band" aria-labelledby="notes-heading">
+      <div class="wrap notes-grid">
+        <div>
+          <header class="section-head">
+            <p class="index">03</p>
+            <div>
+              <h2 id="notes-heading">{t.latest}</h2>
+            </div>
+          </header>
+          {
+            latest && (
+              <article class="note-row">
+                <time datetime={isoDate(latest.data.date)}>{formatDate(latest.data.date, lang)}</time>
+                <div>
+                  <h3><a href={postHref(latest)}>{latest.data.title}</a></h3>
+                  <p>{latest.data.description}</p>
+                </div>
+              </article>
+            )
+          }
+          <p class="more"><a href={routes.blog[lang]}>{t.allNotes}</a></p>
+        </div>
+        <div class="timeline-teaser">
+          <h2>{t.timeline}</h2>
+          <p>{t.timelineTeaser}</p>
+          <p class="more"><a href={routes.timeline[lang]}>{t.timeline}</a></p>
+        </div>
+      </div>
+    </section>
+  </main>
+</Base>

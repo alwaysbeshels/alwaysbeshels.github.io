@@ -1,0 +1,61 @@
+---
+import type { ProjectView } from "../lib/content";
+import type { UI } from "../i18n/ui";
+
+interface Props {
+  project: ProjectView;
+  t: UI;
+  /** Full case-study layout, or the catalogue card. */
+  mode?: "card" | "study";
+}
+
+const { project, t, mode = "card" } = Astro.props;
+const kicker = project.kind === "product" ? t.live : t.openSource;
+const Title = mode === "study" ? "h1" : "h3";
+---
+
+<article class:list={["project", project.kind, mode]} id={project.slug}>
+  <p class="kicker">
+    {project.kind === "product" && <span class="live-dot" aria-hidden="true"></span>}
+    <span>{kicker}</span>
+    {project.license && <span class="kicker-meta">{project.license}</span>}
+  </p>
+  <Title translate="no">
+    {mode === "card" ? <a href={project.href}>{project.title}</a> : project.title}
+  </Title>
+  <p class="summary">{project.summary}</p>
+  {project.tags.length > 0 && (
+    <ul class="tags">
+      {project.tags.map((tag) => <li>{tag}</li>)}
+    </ul>
+  )}
+  <ul class="metrics">
+    {project.metrics.map((metric) => (
+      <li>
+        <b>{metric.value}</b>
+        <span>{metric.label}</span>
+      </li>
+    ))}
+  </ul>
+  <div class="actions">
+    {project.live && (
+      <a class="button" href={project.live}>{t.openMap}</a>
+    )}
+    {project.repo && (
+      <a class="button" href={project.repo}>{t.github}</a>
+    )}
+    {mode === "card" && (
+      <a class="button button-ghost" href={project.href}>{t.caseStudy}</a>
+    )}
+  </div>
+  {mode === "study" && (
+    <div class="prose study-body">
+      {project.body.map((paragraph) => <p>{paragraph}</p>)}
+      {project.points.length > 0 && (
+        <ul>
+          {project.points.map((point) => <li>{point}</li>)}
+        </ul>
+      )}
+    </div>
+  )}
+</article>

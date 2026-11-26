@@ -1,0 +1,13 @@
+---
+import BlogPost from "../../views/BlogPost.astro";
+import { loadPosts, postSlug } from "../../lib/content";
+
+export async function getStaticPaths() {
+  const posts = await loadPosts("en");
+  return posts.map((post) => ({ params: { slug: postSlug(post.id) } }));
+}
+
+const { slug } = Astro.params;
+if (!slug) throw new Error("Missing post slug");
+---
+<BlogPost lang="en" slug={slug} />
