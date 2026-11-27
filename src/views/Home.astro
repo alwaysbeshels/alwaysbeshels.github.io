@@ -79,14 +79,15 @@ const jsonLd = {
 >
   <main id="content" data-pagefind-body>
     <section class="hero wrap">
-      <img class="hero-mark" src="/assets/brand/icon.svg" width="72" height="72" alt={t.logoAlt} />
-      <p class="pill"><span class="live-dot" aria-hidden="true"></span>{t.role} · {t.place}</p>
-      <h1>{site.author}</h1>
-      <p class="lede">{t.heroLede}</p>
-      <p class="quiet">{t.degreeShort}</p>
+      <div class="mark-ring">
+        <img class="hero-mark" src="/assets/brand/icon.svg" width="120" height="120" alt={t.logoAlt} />
+      </div>
+      <h1 class="gradient-name">{site.author}</h1>
+      <p class="tagline">{t.heroLede}</p>
+      <p class="quiet">{t.role} · {t.place} · {t.degreeShort}</p>
       <div class="hero-actions">
-        <a class="button" href={routes.projects[lang]}>{t.seeWork}</a>
-        <a class="button button-ghost" href={routes.about[lang]}>{t.about}</a>
+        <a class="pill-btn" href={routes.projects[lang]}>{t.seeWork}</a>
+        <a class="pill-btn pill-btn-quiet" href={routes.about[lang]}>{t.about}</a>
       </div>
       <SocialList variant="icons" label={t.social} />
     </section>
