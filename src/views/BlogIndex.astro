@@ -1,5 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
+import CatalogueHero from "../components/CatalogueHero.astro";
 import { loadPosts, postHref } from "../lib/content";
 import { formatDate, isoDate } from "../lib/dates";
 import { otherLang, routes, type Lang } from "../i18n/paths";
@@ -12,6 +13,7 @@ interface Props {
 const { lang } = Astro.props;
 const t = useUI(lang);
 const posts = await loadPosts(lang);
+const stats = [`${posts.length} ${posts.length === 1 ? t.statNote : t.statNotes}`];
 const description =
   lang === "en"
     ? "Notes from Shelsea's Lab."
@@ -27,12 +29,10 @@ const description =
   section={t.sectionBlog}
 >
   <main id="content" class="page wrap" data-pagefind-body>
-    <header class="page-head">
-      <p class="eyebrow">{t.blog}</p>
-      <h1>{t.blog}</h1>
-      <p class="lede">{t.blogIntro}</p>
-      <p class="more"><a href={routes.rss[lang]}>{t.rss}</a></p>
-    </header>
+    <CatalogueHero kicker={t.blogKicker} title={t.blogTitle} stats={stats}>
+      <p class="more catalogue-more"><a href={routes.rss[lang]}>{t.rss}</a></p>
+    </CatalogueHero>
+    <p class="lede catalogue-intro">{t.blogIntro}</p>
     <ul class="note-list">
       {
         posts.map((post) => (

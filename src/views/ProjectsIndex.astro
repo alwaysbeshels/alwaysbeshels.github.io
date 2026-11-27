@@ -1,5 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
+import CatalogueHero from "../components/CatalogueHero.astro";
 import ProjectArticle from "../components/ProjectArticle.astro";
 import { groupOpenSource, loadProjects, projectsByKind, toProjectView } from "../lib/content";
 import { otherLang, routes, type Lang } from "../i18n/paths";
@@ -14,6 +15,13 @@ const t = useUI(lang);
 const projects = await loadProjects();
 const live = projectsByKind(projects, "product").map((entry) => toProjectView(entry, lang));
 const groups = groupOpenSource(projects, lang);
+const openCount = projects.length - live.length;
+const word = (count: number, one: string, many: string) => `${count} ${count === 1 ? one : many}`;
+const stats = [
+  word(projects.length, t.statProject, t.statProjects),
+  word(live.length, t.statLive, t.statLive),
+  word(openCount, t.statOpen, t.statOpen),
+];
 const description =
   lang === "en"
     ? "Live products and open source from Shelsea Saint-Fleur. The map is online. The code is public."
@@ -28,13 +36,16 @@ const description =
   alternatePath={routes.projects[otherLang(lang)]}
   section={t.sectionProjects}
 >
-  <main id="content" class="page wrap" data-pagefind-body>
-    <header class="page-head">
-      <h1>{t.projects}</h1>
-      <p class="lede">{t.projectsIntro}</p>
-    </header>
+  <main id="content" class="page wrap catalogue" data-pagefind-body>
+    <CatalogueHero kicker={t.catalogueKicker} title={t.catalogueTitle} stats={stats}>
+      <div class="filters" role="group" aria-label={t.filterLabel}>
+        <button type="button" data-filter="all" aria-pressed="true">{t.filterAll}</button>
+        <button type="button" data-filter="product" aria-pressed="false">{t.live}</button>
+        <button type="button" data-filter="opensource" aria-pressed="false">{t.openSource}</button>
+      </div>
+    </CatalogueHero>
 
-    <section aria-labelledby="live-heading">
+    <section data-kind="product" aria-labelledby="live-heading">
       <header class="section-head">
         <h2 id="live-heading">{t.live}</h2>
         <p>{t.liveIntro}</p>
@@ -44,7 +55,7 @@ const description =
       </div>
     </section>
 
-    <section aria-labelledby="oss-heading">
+    <section data-kind="opensource" aria-labelledby="oss-heading">
       <header class="section-head">
         <h2 id="oss-heading">{t.openSource}</h2>
         <p>{t.ossIntro}</p>
@@ -65,3 +76,22 @@ const description =
     </section>
   </main>
 </Base>
+
+<script>
+  const root = document.querySelector(".catalogue");
+  if (root) {
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>("[data-filter]")];
+    const blocks = [...root.querySelectorAll<HTMLElement>("[data-kind]")];
+    const apply = (kind: string) => {
+      for (const block of blocks) {
+        block.hidden = kind !== "all" && block.dataset.kind !== kind;
+      }
+      for (const button of buttons) {
+        button.setAttribute("aria-pressed", button.dataset.filter === kind ? "true" : "false");
+      }
+    };
+    for (const button of buttons) {
+      button.addEventListener("click", () => apply(button.dataset.filter ?? "all"));
+    }
+  }
+</script>

@@ -1,5 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
+import CatalogueHero from "../components/CatalogueHero.astro";
 import { timeline, timelineCopy } from "../data/timeline";
 import { formatMonth } from "../lib/dates";
 import { otherLang, routes, type Lang } from "../i18n/paths";
@@ -11,6 +12,11 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = useUI(lang);
+const blanks = timeline.filter((entry) => entry.placeholder).length;
+const stats = [
+  `${timeline.length} ${timeline.length === 1 ? t.statEntry : t.statEntries}`,
+  `${blanks} ${blanks === 1 ? t.statBlank : t.statBlanks}`,
+];
 
 const description =
   lang === "en"
@@ -28,18 +34,15 @@ function datesFor(entry: (typeof timeline)[number]): string {
 
 <Base
   lang={lang}
-  title={lang === "en" ? "Experience" : "Parcours"}
+  title={t.timelineTitle}
   description={description}
   path={routes.timeline[lang]}
   alternatePath={routes.timeline[otherLang(lang)]}
   section={t.sectionTimeline}
 >
   <main id="content" class="page wrap" data-pagefind-body>
-    <header class="page-head">
-      <p class="eyebrow">{t.timeline}</p>
-      <h1>{lang === "en" ? "Experience" : "Parcours"}</h1>
-      <p class="lede">{t.timelineIntro}</p>
-    </header>
+    <CatalogueHero kicker={t.timelineKicker} title={t.timelineTitle} stats={stats} />
+    <p class="lede catalogue-intro">{t.timelineIntro}</p>
 
     <p class="known">
       <span class="kicker">{t.known}</span>
