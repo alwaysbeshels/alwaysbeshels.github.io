@@ -2,10 +2,16 @@
 import Base from "../layouts/Base.astro";
 import ProjectArticle from "../components/ProjectArticle.astro";
 import { site } from "../data/site";
-import { featuredProjects, loadPosts, loadProjects, postHref, toProjectView } from "../lib/content";
+import {
+  featuredProjects,
+  groupOpenSource,
+  loadPosts,
+  loadProjects,
+  postHref,
+  toProjectView,
+} from "../lib/content";
 import { formatDate, isoDate } from "../lib/dates";
-import { routes, type Lang } from "../i18n/paths";
-import { otherLang } from "../i18n/paths";
+import { otherLang, routes, type Lang } from "../i18n/paths";
 import { useUI } from "../i18n/ui";
 
 interface Props {
@@ -16,7 +22,7 @@ const { lang } = Astro.props;
 const t = useUI(lang);
 const projects = await loadProjects();
 const live = featuredProjects(projects, "product").map((entry) => toProjectView(entry, lang));
-const open = featuredProjects(projects, "opensource").map((entry) => toProjectView(entry, lang));
+const groups = groupOpenSource(featuredProjects(projects, "opensource"), lang);
 const posts = await loadPosts(lang);
 const latest = posts[0];
 
@@ -72,36 +78,20 @@ const jsonLd = {
 >
   <main id="content" data-pagefind-body>
     <section class="hero wrap">
-      <div class="hero-copy">
-        <p class="eyebrow" translate="no">{site.name}</p>
-        <h1>{site.author}</h1>
-        <p class="lede">{t.heroLede}</p>
-        <p class="credentials">{t.degreeShort}</p>
-        <div class="hero-actions">
-          <a class="button" href={routes.projects[lang]}>{t.seeWork}</a>
-          <a class="button button-ghost" href={routes.about[lang]}>{t.about}</a>
-        </div>
-      </div>
-      <img
-        class="hero-logo"
-        src="/assets/brand/logo-full.svg"
-        width="781"
-        height="721"
-        alt={t.logoAlt}
-      />
+      <img class="hero-mark" src="/assets/brand/icon.svg" width="72" height="72" alt={t.logoAlt} />
+      <h1>{site.author}</h1>
+      <p class="lede">{t.heroLede}</p>
+      <p class="quiet">{t.degreeShort}</p>
     </section>
 
     <section class="band" aria-labelledby="live-heading">
       <div class="wrap">
         <header class="section-head">
-          <p class="index">01</p>
-          <div>
-            <h2 id="live-heading">{t.live}</h2>
-            <p>{t.liveIntro}</p>
-          </div>
+          <h2 id="live-heading">{t.live}</h2>
+          <p>{t.liveIntro}</p>
         </header>
-        <div class="stack">
-          {live.map((project) => <ProjectArticle project={project} t={t} />)}
+        <div class="tiles">
+          {live.map((project) => <ProjectArticle project={project} t={t} mode="tile" />)}
         </div>
       </div>
     </section>
@@ -109,45 +99,44 @@ const jsonLd = {
     <section class="band" aria-labelledby="oss-heading">
       <div class="wrap">
         <header class="section-head">
-          <p class="index">02</p>
-          <div>
-            <h2 id="oss-heading">{t.openSource}</h2>
-            <p>{t.ossIntro}</p>
-          </div>
+          <h2 id="oss-heading">{t.openSource}</h2>
+          <p>{t.ossIntro}</p>
         </header>
-        <div class="stack">
-          {open.map((project) => <ProjectArticle project={project} t={t} />)}
-        </div>
+        {
+          groups.map((group) => (
+            <div class="oss-group">
+              <h3>{group.title}</h3>
+              {group.summary && <p class="group-summary">{group.summary}</p>}
+              <ul class="oss-list">
+                {group.projects.map((project) => <ProjectArticle project={project} t={t} mode="row" />)}
+              </ul>
+            </div>
+          ))
+        }
       </div>
     </section>
 
     <section class="band" aria-labelledby="notes-heading">
-      <div class="wrap notes-grid">
-        <div>
-          <header class="section-head">
-            <p class="index">03</p>
-            <div>
-              <h2 id="notes-heading">{t.latest}</h2>
-            </div>
-          </header>
-          {
-            latest && (
-              <article class="note-row">
-                <time datetime={isoDate(latest.data.date)}>{formatDate(latest.data.date, lang)}</time>
-                <div>
-                  <h3><a href={postHref(latest)}>{latest.data.title}</a></h3>
-                  <p>{latest.data.description}</p>
-                </div>
-              </article>
-            )
-          }
-          <p class="more"><a href={routes.blog[lang]}>{t.allNotes}</a></p>
-        </div>
-        <div class="timeline-teaser">
-          <h2>{t.timeline}</h2>
-          <p>{t.timelineTeaser}</p>
-          <p class="more"><a href={routes.timeline[lang]}>{t.timeline}</a></p>
-        </div>
+      <div class="wrap">
+        <header class="section-head">
+          <h2 id="notes-heading">{t.latest}</h2>
+        </header>
+        {
+          latest && (
+            <article class="note-row">
+              <time datetime={isoDate(latest.data.date)}>{formatDate(latest.data.date, lang)}</time>
+              <div>
+                <h3><a href={postHref(latest)}>{latest.data.title}</a></h3>
+                <p>{latest.data.description}</p>
+              </div>
+            </article>
+          )
+        }
+        <p class="more">
+          <a href={routes.blog[lang]}>{t.allNotes}</a>
+          <a href={routes.timeline[lang]}>{t.timeline}</a>
+        </p>
+        <p class="quiet">{t.timelineTeaser}</p>
       </div>
     </section>
   </main>

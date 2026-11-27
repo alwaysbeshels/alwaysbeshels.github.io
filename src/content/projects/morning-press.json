@@ -5,6 +5,18 @@
   "draft": false,
   "license": "MIT",
   "repo": "https://github.com/alwaysbeshels/morning-press",
+  "theme": {
+    "id": "morning",
+    "order": 1,
+    "en": {
+      "title": "A paper for the morning",
+      "summary": "A newspaper you host yourself, in French or English."
+    },
+    "fr": {
+      "title": "Un journal pour le matin",
+      "summary": "Un journal qu'on héberge soi-même, en français ou en anglais."
+    }
+  },
   "tags": {
     "en": ["MIT", "Cloudflare", "Self-host"],
     "fr": ["MIT", "Cloudflare", "Auto-hébergé"]

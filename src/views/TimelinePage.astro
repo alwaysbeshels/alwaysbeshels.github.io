@@ -41,14 +41,14 @@ function datesFor(entry: (typeof timeline)[number]): string {
       <p class="lede">{t.timelineIntro}</p>
     </header>
 
-    <aside class="known" aria-label={t.known}>
-      <p class="kicker">{t.known}</p>
-      <ul>
-        <li>{t.role}</li>
-        <li>{t.place}</li>
-        <li>{t.degree}</li>
-      </ul>
-    </aside>
+    <p class="known">
+      <span class="kicker">{t.known}</span>
+      {t.role}
+      <span aria-hidden="true"> · </span>
+      {t.place}
+      <span aria-hidden="true"> · </span>
+      {t.degree}
+    </p>
 
     <ol class="timeline">
       {

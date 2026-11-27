@@ -24,6 +24,15 @@ const projects = defineCollection({
     license: z.string().optional(),
     repo: z.url().optional(),
     live: z.url().optional(),
+    /** Open-source projects that share a theme.id are listed together. */
+    theme: z
+      .object({
+        id: z.string(),
+        order: z.number().int(),
+        en: z.object({ title: z.string(), summary: z.string() }),
+        fr: z.object({ title: z.string(), summary: z.string() }),
+      })
+      .optional(),
     tags: z.object({
       en: z.array(z.string()),
       fr: z.array(z.string()),

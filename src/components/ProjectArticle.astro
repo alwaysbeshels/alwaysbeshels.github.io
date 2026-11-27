@@ -1,61 +1,68 @@
 ---
-import type { ProjectView } from "../lib/content";
+import { metricLine, type ProjectView } from "../lib/content";
 import type { UI } from "../i18n/ui";
 
 interface Props {
   project: ProjectView;
   t: UI;
-  /** Full case-study layout, or the catalogue card. */
-  mode?: "card" | "study";
+  /** tile: a live product. row: one line in the open-source list. study: the case-study page. */
+  mode?: "tile" | "row" | "study";
 }
 
-const { project, t, mode = "card" } = Astro.props;
-const kicker = project.kind === "product" ? t.live : t.openSource;
-const Title = mode === "study" ? "h1" : "h3";
+const { project, t, mode = "tile" } = Astro.props;
+const facts = metricLine(project);
 ---
 
-<article class:list={["project", project.kind, mode]} id={project.slug}>
-  <p class="kicker">
-    {project.kind === "product" && <span class="live-dot" aria-hidden="true"></span>}
-    <span>{kicker}</span>
-    {project.license && <span class="kicker-meta">{project.license}</span>}
-  </p>
-  <Title translate="no">
-    {mode === "card" ? <a href={project.href}>{project.title}</a> : project.title}
-  </Title>
-  <p class="summary">{project.summary}</p>
-  {project.tags.length > 0 && (
-    <ul class="tags">
-      {project.tags.map((tag) => <li>{tag}</li>)}
-    </ul>
-  )}
-  <ul class="metrics">
-    {project.metrics.map((metric) => (
-      <li>
-        <b>{metric.value}</b>
-        <span>{metric.label}</span>
-      </li>
-    ))}
-  </ul>
-  <div class="actions">
-    {project.live && (
-      <a class="button" href={project.live}>{t.openMap}</a>
-    )}
-    {project.repo && (
-      <a class="button" href={project.repo}>{t.github}</a>
-    )}
-    {mode === "card" && (
-      <a class="button button-ghost" href={project.href}>{t.caseStudy}</a>
-    )}
-  </div>
-  {mode === "study" && (
-    <div class="prose study-body">
-      {project.body.map((paragraph) => <p>{paragraph}</p>)}
-      {project.points.length > 0 && (
-        <ul>
-          {project.points.map((point) => <li>{point}</li>)}
-        </ul>
-      )}
-    </div>
-  )}
-</article>
+{
+  mode === "tile" && (
+    <article class="tile" id={project.slug}>
+      <img class="tile-icon" src="/assets/brand/icon.svg" width="72" height="72" alt="" />
+      <div>
+        <h3 translate="no"><a href={project.href}>{project.title}</a></h3>
+        <p>{project.summary}</p>
+        {facts && <p class="quiet">{facts}</p>}
+        <p class="text-links">
+          {project.live && <a href={project.live}>{t.openMap}</a>}
+          <a href={project.href}>{t.caseStudy}</a>
+        </p>
+      </div>
+    </article>
+  )
+}
+
+{
+  mode === "row" && (
+    <li class="oss-item" id={project.slug}>
+      <h3 translate="no"><a href={project.href}>{project.title}</a></h3>
+      <p>{project.summary}</p>
+      {facts && <p class="quiet">{facts}</p>}
+      <p class="text-links">
+        {project.repo && <a href={project.repo}>{t.github}</a>}
+        <a href={project.href}>{t.caseStudy}</a>
+      </p>
+    </li>
+  )
+}
+
+{
+  mode === "study" && (
+    <article class="study" id={project.slug}>
+      <p class="kicker">{project.kind === "product" ? t.live : t.openSource}</p>
+      <h1 translate="no">{project.title}</h1>
+      <p class="lede">{project.summary}</p>
+      {facts && <p class="quiet">{facts}</p>}
+      <p class="text-links">
+        {project.live && <a href={project.live}>{t.openMap}</a>}
+        {project.repo && <a href={project.repo}>{t.github}</a>}
+      </p>
+      <div class="prose">
+        {project.body.map((paragraph) => <p>{paragraph}</p>)}
+        {project.points.length > 0 && (
+          <ul>
+            {project.points.map((point) => <li>{point}</li>)}
+          </ul>
+        )}
+      </div>
+    </article>
+  )
+}

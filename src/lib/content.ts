@@ -19,6 +19,14 @@ export type ProjectView = {
   href: string;
 };
 
+export type ThemeGroup = {
+  id: string;
+  order: number;
+  title: string;
+  summary: string;
+  projects: ProjectView[];
+};
+
 export async function loadProjects(): Promise<ProjectEntry[]> {
   const all = await getCollection("projects");
   return all
@@ -57,6 +65,34 @@ export function toProjectView(entry: ProjectEntry, lang: Lang): ProjectView {
     license: entry.data.license,
     href: projectPath(lang, entry.id),
   };
+}
+
+/** One quiet line, not a row of tiles. Values only, in the page language. */
+export function metricLine(project: ProjectView): string {
+  return project.metrics.map((metric) => metric.value).join(" · ");
+}
+
+/** Open-source entries that share theme.id render as one catalogue group. */
+export function groupOpenSource(entries: ProjectEntry[], lang: Lang): ThemeGroup[] {
+  const groups = new Map<string, ThemeGroup>();
+  for (const entry of projectsByKind(entries, "opensource")) {
+    const theme = entry.data.theme;
+    const id = theme?.id ?? "open-source";
+    const view = toProjectView(entry, lang);
+    const existing = groups.get(id);
+    if (existing) {
+      existing.projects.push(view);
+      continue;
+    }
+    groups.set(id, {
+      id,
+      order: theme?.order ?? 100,
+      title: theme ? theme[lang].title : lang === "fr" ? "Code ouvert" : "Open source",
+      summary: theme ? theme[lang].summary : "",
+      projects: [view],
+    });
+  }
+  return [...groups.values()].sort((a, b) => a.order - b.order || a.title.localeCompare(b.title));
 }
 
 export function postSlug(id: string): string {
