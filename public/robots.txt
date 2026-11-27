@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://alwaysbeshels.github.io/sitemap-index.xml

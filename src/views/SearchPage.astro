@@ -1,0 +1,196 @@
+---
+import Base from "../layouts/Base.astro";
+import { otherLang, routes, type Lang } from "../i18n/paths";
+import { useUI } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useUI(lang);
+const description =
+  lang === "en"
+    ? "Search projects, notes, and the timeline on Shelsea's Lab."
+    : "Recherche dans les projets, les notes et le parcours du Shelsea's Lab.";
+---
+
+<Base
+  lang={lang}
+  title={t.search}
+  description={description}
+  path={routes.search[lang]}
+  alternatePath={routes.search[otherLang(lang)]}
+  section={t.search}
+  pagefindIgnore
+>
+  <main id="content" class="page wrap">
+    <header class="page-head">
+      <p class="eyebrow">{t.search}</p>
+      <h1>{t.search}</h1>
+      <p class="lede">{t.searchHint}</p>
+    </header>
+
+    <form
+      class="search-form"
+      role="search"
+      action={routes.search[lang]}
+      method="get"
+      data-search
+      data-one={t.resultOne}
+      data-many={t.resultMany}
+      data-none={t.noResults}
+      data-empty={t.emptyQuery}
+      data-unavailable={t.searchUnavailable}
+    >
+      <label for="q">{t.searchLabel}</label>
+      <div class="search-row">
+        <input id="q" name="q" type="search" placeholder={t.searchPlaceholder} autocomplete="off" enterkeyhint="search" />
+        <button class="button" type="submit">{t.searchButton}</button>
+      </div>
+    </form>
+    <p id="search-status" class="search-status" aria-live="polite"></p>
+    <ol id="search-results" class="search-results"></ol>
+    <noscript>
+      <p>{t.searchNeedsJs}</p>
+      <ul class="note-list">
+        <li><a href={routes.projects[lang]}>{t.projects}</a></li>
+        <li><a href={routes.blog[lang]}>{t.blog}</a></li>
+        <li><a href={routes.timeline[lang]}>{t.timeline}</a></li>
+      </ul>
+    </noscript>
+  </main>
+</Base>
+
+<script>
+  const form = document.querySelector("[data-search]");
+  if (form instanceof HTMLFormElement) {
+    const input = form.querySelector("input[name='q']");
+    const status = document.getElementById("search-status");
+    const list = document.getElementById("search-results");
+    const data = form.dataset;
+
+    const labelFor = (count: number) => {
+      if (count === 1) return data.one ?? "1";
+      return (data.many ?? "{n}").replace("{n}", String(count));
+    };
+
+    const sanitize = (html: string) =>
+      html.replace(/<mark\b[^>]*>/gi, "<mark>").replace(/<(?!\/?mark>)[^>]*>/gi, "");
+
+    const metaText = (value: unknown) => {
+      if (Array.isArray(value)) return value.filter((part) => typeof part === "string").join(", ");
+      return typeof value === "string" ? value : "";
+    };
+
+    type PagefindModule = {
+      init?: () => Promise<void>;
+      search: (query: string) => Promise<{
+        results: Array<{
+          data: () => Promise<{
+            url: string;
+            excerpt?: string;
+            meta?: { title?: unknown; section?: unknown };
+          }>;
+        }>;
+      }>;
+    };
+
+    let pagefind: PagefindModule | null = null;
+    let ready: Promise<void> | null = null;
+
+    const load = () => {
+      if (ready) return ready;
+      const importer = new Function("return import('/pagefind/pagefind.js')") as () => Promise<PagefindModule>;
+      ready = importer()
+        .then(async (mod) => {
+          pagefind = mod;
+          if (typeof mod.init === "function") await mod.init();
+        })
+        .catch(() => {
+          pagefind = null;
+        });
+      return ready;
+    };
+
+    const render = async (query: string) => {
+      if (!status || !list || !(input instanceof HTMLInputElement)) return;
+      const trimmed = query.trim();
+      list.replaceChildren();
+      if (!trimmed) {
+        status.textContent = data.empty ?? "";
+        return;
+      }
+      status.textContent = "";
+      await load();
+      if (!pagefind) {
+        status.textContent = data.unavailable ?? "";
+        return;
+      }
+      const search = await pagefind.search(trimmed);
+      const results = search.results.slice(0, 12);
+      status.textContent = results.length === 0 ? (data.none ?? "") : labelFor(results.length);
+      for (const result of results) {
+        const item = await result.data();
+        const li = document.createElement("li");
+        const link = document.createElement("a");
+        link.href = item.url;
+        const section = metaText(item.meta?.section);
+        if (section) {
+          const kicker = document.createElement("span");
+          kicker.className = "kicker";
+          kicker.textContent = section;
+          link.append(kicker);
+        }
+        const title = document.createElement("strong");
+        title.textContent = metaText(item.meta?.title) || item.url;
+        link.append(title);
+        if (item.excerpt) {
+          const excerpt = document.createElement("p");
+          excerpt.innerHTML = sanitize(item.excerpt);
+          link.append(excerpt);
+        }
+        li.append(link);
+        list.append(li);
+      }
+    };
+
+    const writeQuery = (value: string, replace: boolean) => {
+      const url = new URL(window.location.href);
+      if (value) url.searchParams.set("q", value);
+      else url.searchParams.delete("q");
+      const next = `${url.pathname}${url.search}`;
+      if (replace) history.replaceState(null, "", next);
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const initial = params.get("q") ?? "";
+    if (input instanceof HTMLInputElement) input.value = initial;
+
+    let timer = 0;
+    input?.addEventListener("input", () => {
+      if (!(input instanceof HTMLInputElement)) return;
+      window.clearTimeout(timer);
+      const value = input.value;
+      timer = window.setTimeout(() => {
+        writeQuery(value, true);
+        void render(value);
+      }, 150);
+    });
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!(input instanceof HTMLInputElement)) return;
+      writeQuery(input.value, true);
+      void render(input.value);
+    });
+
+    window.addEventListener("popstate", () => {
+      const next = new URLSearchParams(window.location.search).get("q") ?? "";
+      if (input instanceof HTMLInputElement) input.value = next;
+      void render(next);
+    });
+
+    if (initial) void render(initial);
+  }
+</script>

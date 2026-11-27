@@ -1,0 +1,143 @@
+---
+import SocialList from "./SocialList.astro";
+import { site } from "../data/site";
+import { isCurrent, routes, type Lang } from "../i18n/paths";
+import { useUI } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+  path: string;
+  alternatePath: string;
+}
+
+const { lang, path, alternatePath } = Astro.props;
+const enHref = lang === "en" ? path : alternatePath;
+const frHref = lang === "fr" ? path : alternatePath;
+const t = useUI(lang);
+const pathname = Astro.url.pathname;
+
+const links = [
+  { href: routes.projects[lang], label: t.projects },
+  { href: routes.blog[lang], label: t.blog },
+  { href: routes.timeline[lang], label: t.timeline },
+  { href: routes.about[lang], label: t.about },
+];
+---
+
+<header class="site-header">
+  <div class="wrap header-bar">
+    <a class="brand" href={routes.home[lang]}>
+      <img src="/assets/brand/icon.svg" width="36" height="36" alt="" />
+      <span translate="no">{site.name}</span>
+    </a>
+    <button
+      id="nav-toggle"
+      class="nav-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-nav"
+    >
+      {t.menuOpen}
+    </button>
+    <div id="site-nav" class="nav-panel">
+      <nav class="primary-nav" aria-label={t.navLabel}>
+        <ul>
+          {
+            links.map((link) => (
+              <li>
+                <a href={link.href} aria-current={isCurrent(pathname, link.href) ? "page" : undefined}>
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <div class="header-tools">
+        <a class="tool-link" href={routes.search[lang]}>{t.search}</a>
+        <nav class="languages" aria-label={t.language}>
+          <a
+            href={enHref}
+            hreflang="en-CA"
+            lang="en-CA"
+            aria-current={lang === "en" ? "page" : undefined}
+            aria-label={lang === "fr" ? t.switchTo : undefined}
+          >
+            EN
+          </a>
+          <a
+            href={frHref}
+            hreflang="fr-CA"
+            lang="fr-CA"
+            aria-current={lang === "fr" ? "page" : undefined}
+            aria-label={lang === "en" ? t.switchTo : undefined}
+          >
+            FR
+          </a>
+        </nav>
+        <button id="theme-toggle" class="icon-button" type="button" aria-label={t.theme}>
+          <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M21 14.5A8.5 8.5 0 0 1 9.5 3 7 7 0 1 0 21 14.5z"></path>
+          </svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0-5a1 1 0 0 1 1 1v1.1a1 1 0 1 1-2 0V3a1 1 0 0 1 1-1zm0 17.9a1 1 0 0 1 1 1V22a1 1 0 1 1-2 0v-1.1a1 1 0 0 1 1-1zM4.2 5.6a1 1 0 0 1 1.4 0l.8.8a1 1 0 1 1-1.4 1.4l-.8-.8a1 1 0 0 1 0-1.4zm12.6 12.6a1 1 0 0 1 1.4 0l.8.8a1 1 0 0 1-1.4 1.4l-.8-.8a1 1 0 0 1 0-1.4zM2 12a1 1 0 0 1 1-1h1.1a1 1 0 1 1 0 2H3a1 1 0 0 1-1-1zm17.9 0a1 1 0 0 1 1-1H22a1 1 0 1 1 0 2h-1.1a1 1 0 0 1-1-1zM4.2 18.4a1 1 0 0 1 0-1.4l.8-.8a1 1 0 1 1 1.4 1.4l-.8.8a1 1 0 0 1-1.4 0zm12.6-12.6a1 1 0 0 1 0-1.4l.8-.8a1 1 0 1 1 1.4 1.4l-.8.8a1 1 0 0 1-1.4 0z"
+            ></path>
+          </svg>
+        </button>
+        <SocialList label={t.social} />
+      </div>
+    </div>
+  </div>
+</header>
+
+<script define:vars={{ openLabel: t.menuOpen, closeLabel: t.menuClose, toDark: t.themeToDark, toLight: t.themeToLight, storageKey: site.themeStorageKey }}>
+  const toggle = document.getElementById("nav-toggle");
+  const panel = document.getElementById("site-nav");
+  if (toggle && panel) {
+    const setOpen = (open) => {
+      const wasOpen = panel.classList.contains("is-open");
+      panel.classList.toggle("is-open", open);
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      toggle.textContent = open ? closeLabel : openLabel;
+      if (open) panel.querySelector("a")?.focus();
+      else if (wasOpen) toggle.focus();
+    };
+    toggle.addEventListener("click", () => setOpen(!panel.classList.contains("is-open")));
+    panel.addEventListener("click", (event) => {
+      const target = event.target;
+      if (target instanceof Element && target.closest("a")) setOpen(false);
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") setOpen(false);
+    });
+  }
+
+  const themeButton = document.getElementById("theme-toggle");
+  const root = document.documentElement;
+  const currentTheme = () => {
+    const stored = root.dataset.theme;
+    if (stored === "light" || stored === "dark") return stored;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  };
+  const paintTheme = () => {
+    if (!themeButton) return;
+    const theme = currentTheme();
+    themeButton.setAttribute("aria-label", theme === "dark" ? toLight : toDark);
+    themeButton.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
+  };
+  themeButton?.addEventListener("click", () => {
+    const next = currentTheme() === "dark" ? "light" : "dark";
+    root.dataset.theme = next;
+    try {
+      localStorage.setItem(storageKey, next);
+    } catch {
+      /* storage blocked: the choice still applies for this view */
+    }
+    paintTheme();
+  });
+  paintTheme();
+</script>

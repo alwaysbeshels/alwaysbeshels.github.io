@@ -1,0 +1,27 @@
+---
+interface Props {
+  kicker: string;
+  title: string;
+  stats?: string[];
+}
+
+const { kicker, title, stats = [] } = Astro.props;
+---
+
+<header class="catalogue-hero">
+  <div class="catalogue-glow" aria-hidden="true"></div>
+  <h1 class="catalogue-title">
+    <span>{kicker}</span>
+    <span class="catalogue-title-main">{title}</span>
+  </h1>
+  {
+    stats.length > 0 && (
+      <p class="stat-line">
+        {stats.map((stat) => (
+          <span>{stat}</span>
+        ))}
+      </p>
+    )
+  }
+  <slot />
+</header>

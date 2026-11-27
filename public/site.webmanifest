@@ -1,13 +1,13 @@
 {
   "name": "Shelsea's Lab",
   "short_name": "Shelsea's Lab",
-  "description": "Le portfolio de Shelsea Saint-Fleur.",
-  "lang": "fr-CA",
+  "description": "Shelsea Saint-Fleur, data engineer in Greater Montréal. Live products, open source, and notes.",
+  "lang": "en-CA",
   "dir": "ltr",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#FFFFFF",
+  "background_color": "#FBF7F4",
   "theme_color": "#AC152B",
   "icons": [
     {

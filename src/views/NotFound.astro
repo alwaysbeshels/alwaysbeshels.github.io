@@ -1,0 +1,32 @@
+---
+import Base from "../layouts/Base.astro";
+import { routes } from "../i18n/paths";
+import { useUI } from "../i18n/ui";
+
+const en = useUI("en");
+const fr = useUI("fr");
+---
+
+<Base
+  lang="en"
+  title={en.notFoundTitle}
+  description={en.notFoundEn}
+  path="/404.html"
+  alternatePath={routes.home.fr}
+  section={en.notFoundTitle}
+  paired={false}
+  noindex
+  pagefindIgnore
+>
+  <main id="content" class="page wrap not-found">
+    <h1>404</h1>
+    <div lang="en-CA">
+      <p class="lede">{en.notFoundEn}</p>
+      <p><a class="button" href={routes.home.en}>{en.backHome}</a></p>
+    </div>
+    <div lang="fr-CA">
+      <p class="lede">{fr.notFoundFr}</p>
+      <p><a class="button button-ghost" href={routes.home.fr}>{fr.notFoundHomeFr}</a></p>
+    </div>
+  </main>
+</Base>

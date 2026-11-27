@@ -1,0 +1,153 @@
+---
+import Base from "../layouts/Base.astro";
+import ProjectArticle from "../components/ProjectArticle.astro";
+import SocialList from "../components/SocialList.astro";
+import { site } from "../data/site";
+import {
+  featuredProjects,
+  groupOpenSource,
+  loadPosts,
+  loadProjects,
+  postHref,
+  toProjectView,
+} from "../lib/content";
+import { formatDate, isoDate } from "../lib/dates";
+import { otherLang, routes, type Lang } from "../i18n/paths";
+import { useUI } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useUI(lang);
+const projects = await loadProjects();
+const live = featuredProjects(projects, "product").map((entry) => toProjectView(entry, lang));
+const groups = groupOpenSource(featuredProjects(projects, "opensource"), lang);
+const posts = await loadPosts(lang);
+const latest = posts[0];
+
+const description =
+  lang === "en"
+    ? "Shelsea Saint-Fleur, data engineer in Greater Montréal. Live products, open source, and notes."
+    : "Shelsea Saint-Fleur, ingénieure de données dans le Grand Montréal. Produits en ligne, code ouvert et notes.";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      name: site.name,
+      url: site.url,
+      inLanguage: ["en-CA", "fr-CA"],
+      author: { "@type": "Person", name: site.author },
+      potentialAction: {
+        "@type": "SearchAction",
+        target: `${site.url}${routes.search[lang]}?q={search_term_string}`,
+        "query-input": "required name=search_term_string",
+      },
+    },
+    {
+      "@type": "Person",
+      name: site.author,
+      url: `${site.url}${routes.about[lang]}`,
+      jobTitle: t.role,
+      homeLocation: {
+        "@type": "Place",
+        name: t.place,
+        address: { "@type": "PostalAddress", addressRegion: "Québec", addressCountry: "CA" },
+      },
+      hasCredential: {
+        "@type": "EducationalOccupationalCredential",
+        credentialCategory: "degree",
+        name: t.degree,
+      },
+      sameAs: site.socials.map((item) => item.href),
+    },
+  ],
+};
+---
+
+<Base
+  lang={lang}
+  title={site.name}
+  description={description}
+  path={routes.home[lang]}
+  alternatePath={routes.home[otherLang(lang)]}
+  section={t.sectionHome}
+  jsonLd={jsonLd}
+>
+  <main id="content" data-pagefind-body>
+    <section class="hero wrap">
+      <div class="mark-ring">
+        <img class="hero-mark" src="/assets/brand/icon.svg" width="120" height="120" alt={t.logoAlt} />
+      </div>
+      <h1 class="gradient-name">{site.author}</h1>
+      <p class="tagline">{t.heroLede}</p>
+      <p class="quiet">{t.role} · {t.place} · {t.degreeShort}</p>
+      <div class="hero-actions">
+        <a class="pill-btn" href={routes.projects[lang]}>{t.seeWork}</a>
+        <a class="pill-btn pill-btn-quiet" href={routes.about[lang]}>{t.about}</a>
+      </div>
+      <SocialList variant="icons" label={t.social} />
+    </section>
+
+    <section class="band" aria-labelledby="live-heading">
+      <div class="wrap">
+        <header class="section-head">
+          <h2 id="live-heading">{t.live}</h2>
+          <p>{t.liveIntro}</p>
+        </header>
+        <div class="cards">
+          {live.map((project) => <ProjectArticle project={project} t={t} mode="card" />)}
+        </div>
+      </div>
+    </section>
+
+    <section class="band" aria-labelledby="oss-heading">
+      <div class="wrap">
+        <header class="section-head">
+          <h2 id="oss-heading">{t.openSource}</h2>
+          <p>{t.ossIntro}</p>
+        </header>
+        {
+          groups.map((group) => (
+            <div class="oss-group">
+              <h3>{group.title}</h3>
+              {group.summary && <p class="group-summary">{group.summary}</p>}
+              <ul class="cards">
+                {group.projects.map((project) => (
+                  <li><ProjectArticle project={project} t={t} mode="card" /></li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="band" aria-labelledby="notes-heading">
+      <div class="wrap">
+        <header class="section-head">
+          <h2 id="notes-heading">{t.latest}</h2>
+        </header>
+        {
+          latest && (
+            <article class="note-row">
+              <time datetime={isoDate(latest.data.date)}>{formatDate(latest.data.date, lang)}</time>
+              <div>
+                <h3><a href={postHref(latest)}>{latest.data.title}</a></h3>
+                <p>{latest.data.description}</p>
+              </div>
+            </article>
+          )
+        }
+        <p class="more">
+          <a href={routes.blog[lang]}>{t.allNotes}</a>
+          <a href={routes.timeline[lang]}>{t.timeline}</a>
+        </p>
+        <p class="quiet">{t.timelineTeaser}</p>
+      </div>
+    </section>
+  </main>
+</Base>

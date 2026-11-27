@@ -1,0 +1,77 @@
+---
+import Base from "../layouts/Base.astro";
+import CatalogueHero from "../components/CatalogueHero.astro";
+import { timeline, timelineCopy } from "../data/timeline";
+import { formatMonth } from "../lib/dates";
+import { otherLang, routes, type Lang } from "../i18n/paths";
+import { useUI } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useUI(lang);
+const blanks = timeline.filter((entry) => entry.placeholder).length;
+const stats = [
+  `${timeline.length} ${timeline.length === 1 ? t.statEntry : t.statEntries}`,
+  `${blanks} ${blanks === 1 ? t.statBlank : t.statBlanks}`,
+];
+
+const description =
+  lang === "en"
+    ? "Experience timeline for Shelsea Saint-Fleur. Known facts only — unfinished entries are marked TODO."
+    : "Parcours de Shelsea Saint-Fleur. Seulement les faits connus — les entrées incomplètes sont marquées TODO.";
+
+function datesFor(entry: (typeof timeline)[number]): string {
+  if (!entry.start) return t.todoDates;
+  const start = formatMonth(entry.start, lang);
+  if (entry.current) return `${start} — ${t.present}`;
+  if (!entry.end) return start;
+  return `${start} — ${formatMonth(entry.end, lang)}`;
+}
+---
+
+<Base
+  lang={lang}
+  title={t.timelineTitle}
+  description={description}
+  path={routes.timeline[lang]}
+  alternatePath={routes.timeline[otherLang(lang)]}
+  section={t.sectionTimeline}
+>
+  <main id="content" class="page wrap" data-pagefind-body>
+    <CatalogueHero kicker={t.timelineKicker} title={t.timelineTitle} stats={stats} />
+    <p class="lede catalogue-intro">{t.timelineIntro}</p>
+
+    <p class="known">
+      <span class="kicker">{t.known}</span>
+      {t.role}
+      <span aria-hidden="true"> · </span>
+      {t.place}
+      <span aria-hidden="true"> · </span>
+      {t.degree}
+    </p>
+
+    <ol class="timeline">
+      {
+        timeline.map((entry) => {
+          const copy = timelineCopy(entry, lang);
+          return (
+            <li id={entry.id}>
+              <p class="when">{datesFor(entry)}</p>
+              <article class:list={["event", entry.placeholder && "is-placeholder"]}>
+                {entry.placeholder && <p class="badge">{t.toComplete}</p>}
+                <p class="kicker">{entry.kind === "work" ? t.kindWork : t.kindEducation}</p>
+                <h2>{copy.title}</h2>
+                <p class="org">{copy.org}</p>
+                <p class="where">{copy.location}</p>
+                <p>{copy.summary}</p>
+              </article>
+            </li>
+          );
+        })
+      }
+    </ol>
+  </main>
+</Base>

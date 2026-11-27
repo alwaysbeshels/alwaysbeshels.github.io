@@ -1,0 +1,81 @@
+{
+  "kind": "opensource",
+  "order": 2,
+  "featured": true,
+  "draft": false,
+  "license": "MIT",
+  "repo": "https://github.com/alwaysbeshels/morning-press",
+  "image": "/projects/morning-press.png",
+  "imageAlt": {
+    "en": "Morning Press app icon: a purple angular mark.",
+    "fr": "Icône de Morning Press : un signe anguleux violet."
+  },
+  "theme": {
+    "id": "morning",
+    "order": 1,
+    "en": {
+      "title": "A paper for the morning",
+      "summary": "A newspaper you host yourself, in French or English."
+    },
+    "fr": {
+      "title": "Un journal pour le matin",
+      "summary": "Un journal qu'on héberge soi-même, en français ou en anglais."
+    }
+  },
+  "tags": {
+    "en": ["MIT", "Cloudflare", "Self-host"],
+    "fr": ["MIT", "Cloudflare", "Auto-hébergé"]
+  },
+  "metrics": [
+    {
+      "value": { "en": "MIT", "fr": "MIT" },
+      "label": { "en": "License", "fr": "Licence" }
+    },
+    {
+      "value": { "en": "FR + EN", "fr": "FR + EN" },
+      "label": { "en": "Paper and app", "fr": "Journal et appli" }
+    },
+    {
+      "value": { "en": "Self-host", "fr": "Chez soi" },
+      "label": { "en": "How you run it", "fr": "Comment le lancer" }
+    }
+  ],
+  "en": {
+    "title": "Morning Press",
+    "summary": "An open-source morning newspaper, as a PDF, in French or English. Mail, calendars, weather, markets, and headlines — self-hosted, MIT licensed, with no paid product.",
+    "body": [
+      "Morning Press (Mon Journal du Matin) prepares a morning newspaper on a schedule, or whenever you ask. The paper is a PDF in French or English. You can read it as a full page in the browser or download the file.",
+      "In the two-page layout, page one is a daily puzzle — sudoku, a crossword, or a codeword. Page two is headlines summarized by section, with the puzzle answers printed upside down at the bottom. A one-page layout is there too.",
+      "What goes in the paper comes from accounts you connect and from public feeds. Mail and calendars are read-only, through Nylas, for Google, Outlook, and Apple. Weather is Open-Meteo. An optional stock watchlist and keyword news, from Google News and Bing News RSS, fill out the rest. A recipe, a sourced fact, and a light exercise idea can be included. There is no paid Morning Press subscription, because there is no paid product.",
+      "You host it yourself on the Cloudflare and Neon free tiers, and you invite the email addresses that should get in. The running site stays private behind Cloudflare Access. The software is public, under the MIT license, and you are welcome to clone it.",
+      "The interface is an installable PWA. The app language and the paper language are separate, so the site can be in English while the newspaper is in French, or the other way around.",
+      "Under the hood: a Cloudflare Worker (React and Hono) for the UI and the API, Neon Postgres for accounts and edition history, Workers KV for the HTML and PDF, a cron trigger, Cloudflare Workflows for the generation steps, and Browser Rendering to turn the HTML into a letter-size PDF."
+    ],
+    "points": [
+      "Scheduled editions, plus generate-now",
+      "Read-only mail and calendars for Google, Outlook, and Apple",
+      "Weather, an optional watchlist, and keyword news",
+      "French and English, for the app and for the paper, independently",
+      "MIT license, self-hosted, no paid hosted product"
+    ]
+  },
+  "fr": {
+    "title": "Morning Press",
+    "summary": "Un journal du matin en code ouvert, en PDF, en français ou en anglais. Courriels, calendriers, météo, marchés et manchettes — à héberger soi-même, licence MIT, sans produit payant.",
+    "body": [
+      "Morning Press (Mon Journal du Matin) prépare un journal du matin à l’heure choisie, ou quand on le demande. Le journal est un PDF, en français ou en anglais. On peut le lire en pleine page dans le navigateur, ou télécharger le fichier.",
+      "En mise en page deux pages, la première est un jeu du jour — sudoku, mots croisés ou codeword. La deuxième porte les manchettes résumées par section, et les solutions du jeu sont imprimées à l’envers au bas de la page. Une mise en page d’une page existe aussi.",
+      "Le contenu vient des comptes qu’on connecte et de flux publics. Les courriels et les calendriers sont lus en lecture seule, via Nylas, pour Google, Outlook et Apple. La météo vient d’Open-Meteo. Une liste de titres boursiers, au choix, et des nouvelles par mots-clés (les flux RSS de Google News et de Bing News) complètent le tout. Une recette, un fait sourcé et une idée d’exercice léger peuvent s’ajouter. Il n’y a pas d’abonnement payant à Morning Press, parce qu’il n’y a pas de produit payant.",
+      "On héberge l’application soi-même, sur les forfaits gratuits de Cloudflare et de Neon, et on invite les adresses courriel qui ont le droit d’entrer. Le site déployé reste privé, derrière Cloudflare Access. Le logiciel est public, sous licence MIT, et on peut le cloner.",
+      "L’interface est une PWA qu’on peut installer. La langue de l’application et la langue du journal sont indépendantes\u202F: le site peut être en anglais et le journal en français, ou l’inverse.",
+      "Côté technique\u202F: un Worker Cloudflare (React et Hono) pour l’interface et l’API, Neon Postgres pour les comptes et l’historique des éditions, Workers KV pour le HTML et le PDF, un déclencheur cron, Cloudflare Workflows pour les étapes de génération, et Browser Rendering pour transformer le HTML en PDF au format lettre."
+    ],
+    "points": [
+      "Éditions à l’heure choisie, et génération immédiate",
+      "Courriels et calendriers en lecture seule, pour Google, Outlook et Apple",
+      "Météo, liste de titres au choix, et nouvelles par mots-clés",
+      "Français et anglais, pour l’appli et pour le journal, séparément",
+      "Licence MIT, hébergé chez soi, aucun produit payant"
+    ]
+  }
+}

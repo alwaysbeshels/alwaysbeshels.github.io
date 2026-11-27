@@ -1,0 +1,75 @@
+---
+import type { ProjectView } from "../lib/content";
+import type { UI } from "../i18n/ui";
+
+interface Props {
+  project: ProjectView;
+  t: UI;
+  mode?: "card" | "study";
+}
+
+const { project, t, mode = "card" } = Astro.props;
+const primaryLabel = project.live ? t.openMap : t.github;
+const primaryHref = project.live ?? project.repo;
+---
+
+{
+  mode === "card" ? (
+    <article class="app-row" id={project.slug}>
+      {project.image ? (
+        <img class="project-mark" src={project.image} alt={project.imageAlt ?? ""} width="76" height="76" />
+      ) : (
+        <span class="monogram" aria-hidden="true">{project.monogram}</span>
+      )}
+      <div>
+        <p class="kicker">{project.kind === "product" ? t.live : t.openSource}</p>
+        <h3 translate="no"><a href={project.href}>{project.title}</a></h3>
+        <p class="summary">{project.summary}</p>
+        {(project.license || project.tags[0]) && (
+          <p class="dot-meta"><span class="accent-dot" aria-hidden="true"></span>{project.license ?? project.tags[0]}</p>
+        )}
+        <p class="text-links">
+          {primaryHref && <a href={primaryHref}>{primaryLabel}</a>}
+          <a href={project.href}>{t.caseStudy}</a>
+        </p>
+      </div>
+    </article>
+  ) : (
+    <article class="study">
+      <div class="card-top">
+        {project.image ? (
+          <img class="project-mark" src={project.image} alt={project.imageAlt ?? ""} width="76" height="76" />
+        ) : (
+          <span class="monogram" aria-hidden="true">{project.monogram}</span>
+        )}
+        <div>
+          <p class="kicker">{project.kind === "product" ? t.live : t.openSource}</p>
+          <h1 translate="no">{project.title}</h1>
+        </div>
+      </div>
+      <p class="lede">{project.summary}</p>
+      {project.metrics.length > 0 && (
+        <ul class="metrics">
+          {project.metrics.map((metric) => (
+            <li>
+              <b>{metric.value}</b>
+              <span>{metric.label}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <div class="actions">
+        {primaryHref && <a class="button" href={primaryHref}>{primaryLabel}</a>}
+        {project.live && project.repo && <a class="button button-ghost" href={project.repo}>{t.github}</a>}
+      </div>
+      <div class="prose">
+        {project.body.map((paragraph) => <p>{paragraph}</p>)}
+        {project.points.length > 0 && (
+          <ul>
+            {project.points.map((point) => <li>{point}</li>)}
+          </ul>
+        )}
+      </div>
+    </article>
+  )
+}

@@ -1,0 +1,62 @@
+{
+  "kind": "product",
+  "order": 1,
+  "featured": true,
+  "draft": false,
+  "live": "https://cestdejalenfer.ca/",
+  "image": "/projects/cest-deja-lenfer.svg",
+  "imageAlt": {
+    "en": "C’est déjà l’enfer icon: an orange traffic cone.",
+    "fr": "Icône de C’est déjà l’enfer : un cône de chantier orange."
+  },
+  "tags": {
+    "en": ["Map", "Greater Montréal", "Open data"],
+    "fr": ["Carte", "Grand Montréal", "Données ouvertes"]
+  },
+  "metrics": [
+    {
+      "value": { "en": "Greater Montréal", "fr": "Grand Montréal" },
+      "label": { "en": "Coverage", "fr": "Couverture" }
+    },
+    {
+      "value": { "en": "Driving + walking", "fr": "Auto et marche" },
+      "label": { "en": "Maps", "fr": "Cartes" }
+    },
+    {
+      "value": { "en": "City open data", "fr": "Données ouvertes" },
+      "label": { "en": "Potholes", "fr": "Nids-de-poule" }
+    }
+  ],
+  "en": {
+    "title": "C’est déjà l’enfer",
+    "summary": "A live map of road restrictions in Greater Montréal: closed streets, lane removals, worksites, and places where a detour is likely.",
+    "body": [
+      "C’est déjà l’enfer is a map I keep online for the way Montréal actually moves. It draws road restrictions across Greater Montréal — closed streets, removed lanes, construction, and corridors where you will probably be sent around — from official sources.",
+      "There are two ways to look at the network. Driving is the street-level view of restrictions and likely detours. Walking is the same city on foot. A statistics view sits beside the maps.",
+      "Potholes are a separate section, not another layer on the driving map. That part reads City of Montréal open data: 311 requests in the pothole category, and mechanical patching records. Locations are the city’s published points, which are approximate, and the colours are an estimate from the dates — not a confirmation that a hole was fixed, and not a live inspection. The page says so.",
+      "The map itself is bilingual. This page only links the live site."
+    ],
+    "points": [
+      "Driving and walking maps for Greater Montréal",
+      "Restrictions, closures, and worksites from official sources",
+      "A statistics view next to the maps",
+      "Potholes from City of Montréal open data, with the limits of that data stated on the map"
+    ]
+  },
+  "fr": {
+    "title": "C’est déjà l’enfer",
+    "summary": "Une carte en ligne des entraves routières dans le Grand Montréal\u202F: rues fermées, voies retirées, chantiers et endroits où un détour est probable.",
+    "body": [
+      "C’est déjà l’enfer est une carte que je laisse en ligne pour la façon dont Montréal se déplace vraiment. Elle trace les entraves du Grand Montréal — rues fermées, voies retirées, chantiers et axes où l’on va probablement vous faire contourner — à partir de sources officielles.",
+      "Deux façons de voir le réseau. L’auto, c’est la vue des restrictions et des détours probables. La marche, c’est la même ville à pied. Une vue statistiques se trouve à côté des cartes.",
+      "Les nids-de-poule sont une section à part, pas une couche de plus sur la carte auto. Cette partie lit les données ouvertes de la Ville de Montréal\u202F: les requêtes 311 de la catégorie nid-de-poule et les enregistrements de colmatage mécanique. Les points sont ceux que la Ville publie, donc approximatifs, et les couleurs sont une estimation à partir des dates — pas une confirmation qu’un trou a été réparé, et pas une inspection en direct. La page le dit.",
+      "La carte est bilingue. Cette fiche ne pointe que vers le site en ligne."
+    ],
+    "points": [
+      "Cartes auto et marche pour le Grand Montréal",
+      "Entraves, fermetures et chantiers, à partir de sources officielles",
+      "Une vue statistiques à côté des cartes",
+      "Nids-de-poule à partir des données ouvertes de la Ville, avec les limites indiquées sur la carte"
+    ]
+  }
+}

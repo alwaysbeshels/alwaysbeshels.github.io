@@ -1,0 +1,66 @@
+---
+import { render } from "astro:content";
+import Base from "../layouts/Base.astro";
+import { site } from "../data/site";
+import { findPost, findTranslation, postHref } from "../lib/content";
+import { formatDate, isoDate } from "../lib/dates";
+import { absolute, otherLang, routes, type Lang } from "../i18n/paths";
+import { useUI } from "../i18n/ui";
+
+interface Props {
+  lang: Lang;
+  slug: string;
+}
+
+const { lang, slug } = Astro.props;
+const t = useUI(lang);
+const post = await findPost(lang, slug);
+if (!post) throw new Error(`Unknown post: ${slug}`);
+const translation = await findTranslation(post.data.translationKey, otherLang(lang));
+const alternatePath = translation ? postHref(translation) : routes.blog[otherLang(lang)];
+const { Content } = await render(post);
+const canonical = absolute(postHref(post));
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.date.toISOString(),
+  dateModified: post.data.date.toISOString(),
+  inLanguage: lang === "fr" ? "fr-CA" : "en-CA",
+  image: absolute(site.ogImage),
+  mainEntityOfPage: canonical,
+  author: {
+    "@type": "Person",
+    name: site.author,
+    url: site.url,
+  },
+};
+---
+
+<Base
+  lang={lang}
+  title={post.data.title}
+  description={post.data.description}
+  path={postHref(post)}
+  alternatePath={alternatePath}
+  section={t.sectionNote}
+  ogType="article"
+  published={post.data.date}
+  jsonLd={jsonLd}
+>
+  <main id="content" class="page wrap prose-page" data-pagefind-body>
+    <p class="back"><a href={routes.blog[lang]}>{t.allNotes}</a></p>
+    <header class="page-head">
+      <p class="eyebrow">{t.blog}</p>
+      <h1>{post.data.title}</h1>
+      <p class="meta">
+        <time datetime={isoDate(post.data.date)}>{formatDate(post.data.date, lang)}</time>
+      </p>
+    </header>
+    <div class="prose">
+      <Content />
+    </div>
+  </main>
+</Base>
