@@ -5,6 +5,11 @@
   "draft": false,
   "license": "MIT",
   "repo": "https://github.com/alwaysbeshels/morning-press",
+  "image": "/projects/morning-press.png",
+  "imageAlt": {
+    "en": "Morning Press app icon: a purple angular mark.",
+    "fr": "Icône de Morning Press : un signe anguleux violet."
+  },
   "theme": {
     "id": "morning",
     "order": 1,

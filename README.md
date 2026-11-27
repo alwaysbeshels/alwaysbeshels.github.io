@@ -38,7 +38,9 @@ Create one JSON file in `src/content/projects/`. Copy `morning-press.json` for a
 | `live` | Public URL. Omit if there is no public site. |
 | `repo` | Public GitHub URL. **Omit this for a private repository.** Never paste a private URL. |
 | `license` | SPDX id, when the project is public. |
-| `tags`, `metrics` | Short labels, with `en` and `fr`. Metrics show as one quiet line, not tiles. |
+| `tags`, `metrics` | Short labels, with `en` and `fr`. Metrics render as tiles on the card. |
+| `image` | Optional. A file on this site, for example `/projects/your-slug.svg`. Use the project's own logo, favicon, or a screenshot. Omit it when there isn't one. **Never use the Shelsea's Lab flask.** |
+| `imageAlt` | Required when `image` is set. `en` and `fr` descriptions of that image. |
 | `theme` | Open source only. Projects that share `theme.id` are listed together. `theme.order` sorts the groups. Each language has a `title` and a `summary`. |
 | `en`, `fr` | `title`, `summary`, `body` (paragraphs), optional `points`. |
 
@@ -82,6 +84,6 @@ Icons and the web manifest that the browser loads live in `public/` (`/favicon.i
 
 ## Français — ajouter du contenu
 
-- **Projet** : un fichier JSON dans `src/content/projects/`, avec les textes `en` et `fr`. Pas de champ `repo` si le dépôt est privé. Pour le code ouvert, un `theme` (`id`, `order`, `title`, `summary`) regroupe les projets qui partagent le même `id`.
+- **Projet** : un fichier JSON dans `src/content/projects/`, avec les textes `en` et `fr`. Pas de champ `repo` si le dépôt est privé. Pour le code ouvert, un `theme` (`id`, `order`, `title`, `summary`) regroupe les projets qui partagent le même `id`. `image` est facultatif : le logo du projet, ou rien. Sans image, la carte montre les initiales. Jamais la fiole du Shelsea's Lab.
 - **Billet** : deux fichiers Markdown, même `translationKey`, dans `src/content/blog/en/` et `src/content/blog/fr/`.
 - **Parcours** : `src/data/timeline.ts`. Remplacer les `TODO`, puis mettre `placeholder` à `false`. Ne pas inventer d'employeur, de titre ou de date.

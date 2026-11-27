@@ -39,8 +39,8 @@ const description =
         <h2 id="live-heading">{t.live}</h2>
         <p>{t.liveIntro}</p>
       </header>
-      <div class="tiles">
-        {live.map((project) => <ProjectArticle project={project} t={t} mode="tile" />)}
+      <div class="cards">
+        {live.map((project) => <ProjectArticle project={project} t={t} mode="card" />)}
       </div>
     </section>
 
@@ -54,8 +54,10 @@ const description =
           <div class="oss-group">
             <h3>{group.title}</h3>
             {group.summary && <p class="group-summary">{group.summary}</p>}
-            <ul class="oss-list">
-              {group.projects.map((project) => <ProjectArticle project={project} t={t} mode="row" />)}
+            <ul class="cards">
+              {group.projects.map((project) => (
+                <li><ProjectArticle project={project} t={t} mode="card" /></li>
+              ))}
             </ul>
           </div>
         ))

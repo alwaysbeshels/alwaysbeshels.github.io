@@ -24,6 +24,13 @@ const projects = defineCollection({
     license: z.string().optional(),
     repo: z.url().optional(),
     live: z.url().optional(),
+    /**
+     * Optional project mark. A path on this site, such as /projects/example.svg.
+     * Never point this at the Shelsea's Lab flask. Leave it out and the card
+     * uses a monogram of the project's initials.
+     */
+    image: z.string().optional(),
+    imageAlt: z.object({ en: z.string(), fr: z.string() }).optional(),
     /** Open-source projects that share a theme.id are listed together. */
     theme: z
       .object({
@@ -48,6 +55,21 @@ const projects = defineCollection({
       .max(4),
     en: localized,
     fr: localized,
+  }).superRefine((project, ctx) => {
+    if (project.image && !project.imageAlt) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["imageAlt"],
+        message: "imageAlt is required in both languages when image is set.",
+      });
+    }
+    if (project.image?.includes("/assets/brand/")) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["image"],
+        message: "Project images cannot use the Shelsea's Lab logo.",
+      });
+    }
   }),
 });
 

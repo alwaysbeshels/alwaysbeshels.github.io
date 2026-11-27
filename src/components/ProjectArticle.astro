@@ -1,60 +1,64 @@
 ---
-import { metricLine, type ProjectView } from "../lib/content";
+import type { ProjectView } from "../lib/content";
 import type { UI } from "../i18n/ui";
 
 interface Props {
   project: ProjectView;
   t: UI;
-  /** tile: a live product. row: one line in the open-source list. study: the case-study page. */
-  mode?: "tile" | "row" | "study";
+  /** card: catalogue. study: the case-study page. */
+  mode?: "card" | "study";
 }
 
-const { project, t, mode = "tile" } = Astro.props;
-const facts = metricLine(project);
+const { project, t, mode = "card" } = Astro.props;
+const primaryLabel = project.live ? t.openMap : t.github;
+const primaryHref = project.live ?? project.repo;
 ---
 
-{
-  mode === "tile" && (
-    <article class="tile" id={project.slug}>
-      <img class="tile-icon" src="/assets/brand/icon.svg" width="72" height="72" alt="" />
-      <div>
-        <h3 translate="no"><a href={project.href}>{project.title}</a></h3>
-        <p>{project.summary}</p>
-        {facts && <p class="quiet">{facts}</p>}
-        <p class="text-links">
-          {project.live && <a href={project.live}>{t.openMap}</a>}
-          <a href={project.href}>{t.caseStudy}</a>
-        </p>
-      </div>
-    </article>
-  )
-}
-
-{
-  mode === "row" && (
-    <li class="oss-item" id={project.slug}>
-      <h3 translate="no"><a href={project.href}>{project.title}</a></h3>
-      <p>{project.summary}</p>
-      {facts && <p class="quiet">{facts}</p>}
-      <p class="text-links">
-        {project.repo && <a href={project.repo}>{t.github}</a>}
-        <a href={project.href}>{t.caseStudy}</a>
-      </p>
-    </li>
-  )
-}
-
-{
-  mode === "study" && (
-    <article class="study" id={project.slug}>
+<article class:list={["card", mode]} id={mode === "card" ? project.slug : undefined}>
+  <div class="card-top">
+    {
+      project.image ? (
+        <img class="project-mark" src={project.image} alt={project.imageAlt ?? ""} width="64" height="64" />
+      ) : (
+        <span class="monogram" aria-hidden="true">{project.monogram}</span>
+      )
+    }
+    <div>
       <p class="kicker">{project.kind === "product" ? t.live : t.openSource}</p>
-      <h1 translate="no">{project.title}</h1>
-      <p class="lede">{project.summary}</p>
-      {facts && <p class="quiet">{facts}</p>}
-      <p class="text-links">
-        {project.live && <a href={project.live}>{t.openMap}</a>}
-        {project.repo && <a href={project.repo}>{t.github}</a>}
-      </p>
+      {mode === "study" ? (
+        <h1 translate="no">{project.title}</h1>
+      ) : (
+        <h3 translate="no"><a href={project.href}>{project.title}</a></h3>
+      )}
+    </div>
+  </div>
+  <p class={mode === "study" ? "lede" : "summary"}>{project.summary}</p>
+  {
+    project.metrics.length > 0 && (
+      <ul class="metrics">
+        {project.metrics.map((metric) => (
+          <li>
+            <b>{metric.value}</b>
+            <span>{metric.label}</span>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+  {
+    project.tags.length > 0 && (
+      <ul class="tags">
+        {project.tags.map((tag) => <li>{tag}</li>)}
+      </ul>
+    )
+  }
+  <div class="actions">
+    {primaryHref && <a class="button" href={primaryHref}>{primaryLabel}</a>}
+    {mode === "card" && <a class="button button-ghost" href={project.href}>{t.caseStudy}</a>}
+    {mode === "study" && project.live && project.repo && <a class="button button-ghost" href={project.repo}>{t.github}</a>}
+  </div>
+  {
+    mode === "study" && (
       <div class="prose">
         {project.body.map((paragraph) => <p>{paragraph}</p>)}
         {project.points.length > 0 && (
@@ -63,6 +67,6 @@ const facts = metricLine(project);
           </ul>
         )}
       </div>
-    </article>
-  )
-}
+    )
+  }
+</article>

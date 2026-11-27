@@ -17,6 +17,9 @@ export type ProjectView = {
   repo?: string;
   license?: string;
   href: string;
+  image?: string;
+  imageAlt?: string;
+  monogram: string;
 };
 
 export type ThemeGroup = {
@@ -64,12 +67,21 @@ export function toProjectView(entry: ProjectEntry, lang: Lang): ProjectView {
     repo: entry.data.repo,
     license: entry.data.license,
     href: projectPath(lang, entry.id),
+    image: entry.data.image,
+    imageAlt: entry.data.image ? entry.data.imageAlt?.[lang] : undefined,
+    monogram: monogram(copy.title),
   };
 }
 
-/** One quiet line, not a row of tiles. Values only, in the page language. */
-export function metricLine(project: ProjectView): string {
-  return project.metrics.map((metric) => metric.value).join(" · ");
+/** Two initials. Used only when a project has no image of its own. */
+export function monogram(title: string): string {
+  const words = title
+    .replace(/['’]/g, "")
+    .split(/[^0-9A-Za-zÀ-ÖØ-öø-ÿ]+/)
+    .filter((word) => word.length > 0);
+  const letters = words.map((word) => word[0] ?? "").join("");
+  const raw = letters.length >= 2 ? letters.slice(0, 2) : (words[0] ?? title).slice(0, 2);
+  return raw.toLocaleUpperCase("fr-CA");
 }
 
 /** Open-source entries that share theme.id render as one catalogue group. */

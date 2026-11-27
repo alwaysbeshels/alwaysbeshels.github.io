@@ -4,6 +4,11 @@
   "featured": true,
   "draft": false,
   "live": "https://cestdejalenfer.ca/",
+  "image": "/projects/cest-deja-lenfer.svg",
+  "imageAlt": {
+    "en": "C’est déjà l’enfer icon: an orange traffic cone.",
+    "fr": "Icône de C’est déjà l’enfer : un cône de chantier orange."
+  },
   "tags": {
     "en": ["Map", "Greater Montréal", "Open data"],
     "fr": ["Carte", "Grand Montréal", "Données ouvertes"]

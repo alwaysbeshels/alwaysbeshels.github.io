@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import ProjectArticle from "../components/ProjectArticle.astro";
+import SocialList from "../components/SocialList.astro";
 import { site } from "../data/site";
 import {
   featuredProjects,
@@ -79,9 +80,15 @@ const jsonLd = {
   <main id="content" data-pagefind-body>
     <section class="hero wrap">
       <img class="hero-mark" src="/assets/brand/icon.svg" width="72" height="72" alt={t.logoAlt} />
+      <p class="pill"><span class="live-dot" aria-hidden="true"></span>{t.role} · {t.place}</p>
       <h1>{site.author}</h1>
       <p class="lede">{t.heroLede}</p>
       <p class="quiet">{t.degreeShort}</p>
+      <div class="hero-actions">
+        <a class="button" href={routes.projects[lang]}>{t.seeWork}</a>
+        <a class="button button-ghost" href={routes.about[lang]}>{t.about}</a>
+      </div>
+      <SocialList variant="icons" label={t.social} />
     </section>
 
     <section class="band" aria-labelledby="live-heading">
@@ -90,8 +97,8 @@ const jsonLd = {
           <h2 id="live-heading">{t.live}</h2>
           <p>{t.liveIntro}</p>
         </header>
-        <div class="tiles">
-          {live.map((project) => <ProjectArticle project={project} t={t} mode="tile" />)}
+        <div class="cards">
+          {live.map((project) => <ProjectArticle project={project} t={t} mode="card" />)}
         </div>
       </div>
     </section>
@@ -107,8 +114,10 @@ const jsonLd = {
             <div class="oss-group">
               <h3>{group.title}</h3>
               {group.summary && <p class="group-summary">{group.summary}</p>}
-              <ul class="oss-list">
-                {group.projects.map((project) => <ProjectArticle project={project} t={t} mode="row" />)}
+              <ul class="cards">
+                {group.projects.map((project) => (
+                  <li><ProjectArticle project={project} t={t} mode="card" /></li>
+                ))}
               </ul>
             </div>
           ))
